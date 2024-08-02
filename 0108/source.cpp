@@ -47,13 +47,6 @@ struct Document {
     int rating;
 };
 
-// enum class DocumentStatus {
-//     ACTUAL,
-//     IRRELEVANT,
-//     BANNED,
-//     REMOVED
-// };
-
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -149,8 +142,6 @@ private:
     }
     
     double ComputeWordInverseDocumentFreq(const string& word) const {
-        // return log(document_ratings_.size() * 1.0 / word_to_document_freqs_.at(word).size());
-        // return log(document_info_.rating.size() * 1.0 / word_to_document_freqs_.at(word).size());
         return log(documents_info_.size() * 1.0 / word_to_document_freqs_.at(word).size());
     }
 
@@ -162,12 +153,9 @@ private:
             }
             const double inverse_document_freq = ComputeWordInverseDocumentFreq(word);
             for (const auto &[document_id, term_freq] : word_to_document_freqs_.at(word)) {
-                // if (document_status_.at(document_id) == status) {
-                // if (document_info_.status.at(document_id) == status) {
                 if (documents_info_.at(document_id).status == status) {
                     document_to_relevance[document_id] += term_freq * inverse_document_freq;
                 }
-                // document_to_relevance[document_id] += term_freq * inverse_document_freq;
             }
         }
         
@@ -185,8 +173,6 @@ private:
             matched_documents.push_back({
                 document_id,
                 relevance,
-                // document_ratings_.at(document_id)
-                // documents_info_.rating.at(document_id)
                 documents_info_.at(document_id).rating
             });
         }
