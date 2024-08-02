@@ -12,6 +12,8 @@ using namespace std;
 
 const int MAX_RESULT_DOCUMENT_COUNT = 5;
 
+const double EPSILON = 1e-6;
+
 string ReadLine() {
     string s;
     getline(cin, s);
@@ -47,6 +49,13 @@ struct Document {
     int rating;
 };
 
+enum class DocumentStatus {
+    ACTUAL,
+    IRRELEVANT,
+    BANNED,
+    REMOVED
+};
+
 class SearchServer {
 public:
     void SetStopWords(const string& text) {
@@ -55,13 +64,6 @@ public:
         }
     }    
     
-    enum class DocumentStatus {
-        ACTUAL,
-        IRRELEVANT,
-        BANNED,
-        REMOVED
-    };
-
     void AddDocument(int document_id, const string& document, DocumentStatus status, const vector<int>& ratings) {
         const vector<string> words = SplitIntoWordsNoStop(document);
         const double inv_word_count = 1.0 / words.size();
@@ -78,12 +80,48 @@ public:
         
         sort(matched_documents.begin(), matched_documents.end(),
              [](const Document& lhs, const Document& rhs) {
-                 return lhs.relevance > rhs.relevance;
+                if (abs(lhs.relevance - rhs.relevance) < EPSILON) {
+                    return lhs.rating > rhs.rating;
+                } else {
+                    return lhs.relevance > rhs.relevance;
+                }
              });
         if (matched_documents.size() > MAX_RESULT_DOCUMENT_COUNT) {
             matched_documents.resize(MAX_RESULT_DOCUMENT_COUNT);
         }
         return matched_documents;
+    }
+
+    int GetDocumentCount() const {
+        return static_cast<int>(documents_info_.size());
+    }
+
+    tuple<vector<string>, DocumentStatus> MatchDocument(const string& raw_query, int document_id) const {
+        vector<string> document_plus_words;
+        const Query query = ParseQuery(raw_query);
+        for (const string& word : query.plus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            for (const auto& [id, _] : word_to_document_freqs_.at(word)) {
+                if (id == document_id) {
+                    document_plus_words.push_back(word);
+                }
+            }
+        }
+
+        for (const string& word : query.minus_words) {
+            if (word_to_document_freqs_.count(word) == 0) {
+                continue;
+            }
+            for (const auto& [id, _] : word_to_document_freqs_.at(word)) {
+                if (id == document_id) {
+                    document_plus_words.clear();
+                }
+            }
+        }
+
+        return {document_plus_words, documents_info_.at(document_id).status};
     }
     
 private:
@@ -188,48 +226,38 @@ private:
     }
 
 private:
-    set<string> stop_words_;
-    map<string, map<int, double>> word_to_document_freqs_;
-
     struct DocumentInfo {
         int rating;
         DocumentStatus status;
     };
 
+    set<string> stop_words_;
+    map<string, map<int, double>> word_to_document_freqs_;
     map<int, DocumentInfo> documents_info_;
 };
 
-// SearchServer CreateSearchServer() {
-//     SearchServer search_server;
-//     search_server.SetStopWords(ReadLine());
+/*
+SearchServer CreateSearchServer() {
+    SearchServer search_server;
+    search_server.SetStopWords(ReadLine());
 
-//     const int document_count = ReadLineWithNumber();
-//     for (int document_id = 0; document_id < document_count; ++document_id) {
-//         const string document = ReadLine();
-//         int ratings_size;
-//         cin >> ratings_size;
+    const int document_count = ReadLineWithNumber();
+    for (int document_id = 0; document_id < document_count; ++document_id) {
+        const string document = ReadLine();
+        int ratings_size;
+        cin >> ratings_size;
         
-//         vector<int> ratings(ratings_size, 0);
-//         for (int& rating : ratings) {
-//             cin >> rating;
-//         }
+        vector<int> ratings(ratings_size, 0);
+        for (int& rating : ratings) {
+            cin >> rating;
+        }
         
-//         search_server.AddDocument(document_id, document, ratings);
-//         ReadLine();
-//     }
+        search_server.AddDocument(document_id, document, ratings);
+        ReadLine();
+    }
     
-//     return search_server;
-// }
-
-int main() {
-    // const SearchServer search_server = CreateSearchServer();
-
-    // const string query = ReadLine();
-    // for (const Document& document : search_server.FindTopDocuments(query)) {
-    //     cout << "{ "
-    //          << "document_id = " << document.id << ", "
-    //          << "relevance = " << document.relevance << ", "
-    //          << "rating = " << document.rating
-    //          << " }" << endl;
-    // }
+    return search_server;
 }
+*/
+
+int main() {}
