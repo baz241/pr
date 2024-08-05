@@ -1,38 +1,41 @@
 #include <iostream>
-#include <map>
-#include <string>
 #include <vector>
+#include <set>
 
 using namespace std;
 
-template <typename Term>
+template <typename Element>
+ostream& operator<<(ostream& out, const vector<Element>& container);
+template <typename Element>
+ostream& operator<<(ostream& out, const set<Element>& container);
 
-map<Term, int> ComputeTermFreqs(const vector<Term>& terms) {
-    map<Term, int> term_freqs;
-    for (const Term& term : terms) {
-        ++term_freqs[term];
+template <typename Container>
+void Print(ostream& out, const Container& container) {
+    bool is_first = true;
+    for (const auto& element : container) {
+        if (is_first) {
+            out << element;
+            is_first = false;
+            continue;
+        }
+        out << ", "s << element;
     }
-    return term_freqs;
 }
-pair<string, int> FindMaxFreqAnimal(const vector<pair<string, int>>& animals) {
-    // верните животного с максимальной частотой
+
+template <typename Type>
+ostream& operator<<(ostream& out, const vector<Type>& container) {
+    Print(out, container);
+    return out;
+}
+
+template <typename Type>
+ostream& operator<<(ostream& out, const set<Type>& container) {
+    Print(out, container);
+    return out;
 }
 
 int main() {
-    const vector<pair<string, int>> animals = {
-        {"Murka"s, 5},  // 5-летняя Мурка
-        {"Belka"s, 6},  // 6-летняя Белка
-        {"Murka"s, 7},  // 7-летняя Мурка не та же, что 5-летняя!
-        {"Murka"s, 5},  // Снова 5-летняя Мурка
-        {"Belka"s, 6},  // Снова 6-летняя Белка
-    };
-
-    const map<pair<string, int>, int> temp = ComputeTermFreqs(animals);
-    for (const auto& [one, count] : temp) {
-        const auto& [name, age] = one;
-        cout << name << " "s << age << " "s << count << endl;
-    }
-
-    // const pair<string, int> max_freq_animal = FindMaxFreqAnimal(animals);
-    // cout << max_freq_animal.first << " "s << max_freq_animal.second << endl;
+    const set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
+    cout << cats << endl; 
+    return 0;
 }
