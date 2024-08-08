@@ -1,71 +1,31 @@
 #include <iostream>
-#include <map>
-#include <set>
-#include <vector>
+#include <string>
 
 using namespace std;
 
-template <typename Element>
-ostream& operator<<(ostream& out, const vector<Element>& container);
-template <typename Element>
-ostream& operator<<(ostream& out, const set<Element>& container);
-template <typename Key, typename Value>
-ostream& operator<<(ostream& out, const map<Key, Value>& container);
-
-
-template <typename First, typename Second>
-ostream& operator<<(ostream& out, const pair<First, Second>& p) {
-    return out << '(' << p.first << ", "s << p.second << ')';
-}
-
-template <typename Container>
-void Print(ostream& out, const Container& container) {
-    bool is_first = true;
-    for (const auto& element : container) {
-        if (!is_first) {
-            out << ", "s;
-        }
-        is_first = false;
-        out << element;
-    }
-}
-
-template <typename Element>
-ostream& operator<<(ostream& out, const vector<Element>& container) {
-    out << '[';
-    Print(out, container);
-    out << ']';
-    return out;
-}
-
-template <typename Element>
-ostream& operator<<(ostream& out, const set<Element>& container) {
-    out << '{';
-    Print(out, container);
-    out << '}';
-    return out;
-}
-
-template <typename Key, typename Value>
-ostream& operator<<(ostream& out, const map<Key, Value>& container) {
-    out << '<';
-    Print(out, container);
-    out << '>';
-    return out;
+// Определяет, будет ли слово палиндромом
+// text может быть строкой, содержащей строчные буквы английского алфавита и пробелы
+// Пустые строки и строки, состоящие только из пробелов, - это не палиндромы
+bool IsPalindrome(const string& text) {
+    // Напишите недостающий код
+    size_t start = 0;
+    size_t end = 0;
+    while (start != text.size() && end )
 }
 
 int main() {
-    const set<string> cats = {"Мурка"s, "Белка"s, "Георгий"s, "Рюрик"s};
-    cout << cats << endl;
+    string text;
+    getline(cin, text);
 
-    const vector<int> ages = {10, 5, 2, 12};
-    cout << ages << endl;
+    cout << 1 / 2 << endl;
 
-    const map<string, int> cat_ages = {
-        {"Мурка"s, 10},
-        {"Белка"s, 5},
-        {"Георгий"s, 2},
-        {"Рюрик"s, 12}
-    };
-    cout << cat_ages << endl;
+    // cout << text.size() / 2;
+
+    // return 0;
+
+    if (IsPalindrome(text)) {
+        cout << "palindrome"s << endl;
+    } else {
+        cout << "not a palindrome"s << endl;
+    }
 }

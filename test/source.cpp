@@ -1,96 +1,44 @@
+#include <algorithm>
 #include <iostream>
-#include <map>
-#include <string>
-#include <tuple>
 #include <vector>
 
 using namespace std;
 
-// Перечислимый тип для статуса задачи
-enum class TaskStatus {
-    NEW,          // новая
-    IN_PROGRESS,  // в разработке
-    TESTING,      // на тестировании
-    DONE          // завершена
+struct Animal {
+    string name;
+    int age;
+    double weight;
 };
 
-// Объявляем тип-синоним для map<TaskStatus, int>,
-// позволяющего хранить количество задач каждого статуса
-using TasksInfo = map<TaskStatus, int>;
-
-class TeamTasks {
-public:
-    // Получить статистику по статусам задач конкретного разработчика
-    const TasksInfo& GetPersonTasksInfo(const string& person) const {
-        return tasks_.at(person);
-    }
-
-    // Добавить новую задачу (в статусе NEW) для конкретного разработчика
-    void AddNewTask(const string& person) {
-        ++tasks_[person][TaskStatus::NEW];
-    }
-
-    // Обновить статусы по данному количеству задач конкретного разработчика,
-    // подробности см. ниже
-    tuple<TasksInfo, TasksInfo> PerformPersonTasks(const string& person, int task_count) {
-        if (tasks_.count(person) == 0) {
-            return {{}, {}};
+template <typename Container, typename KeyMapper>
+void SortBy(Container& container, KeyMapper key_mapper, bool reverse = false) {
+    sort(container.begin(), container.end(), [key_mapper, reverse](const auto& lhs, const auto& rhs) {
+        if (reverse) {
+            return key_mapper(lhs) > key_mapper(rhs);
+        } else {
+            return key_mapper(lhs) < key_mapper(rhs);
         }
-        TasksInfo& person_tasks = tasks_[person];
-        TasksInfo one;
-        TasksInfo two;
-        for (TaskStatus status = TaskStatus::NEW; status < TaskStatus::DONE; status = Next(status)) {
-            const int temp = person_tasks[status] - one[status];
-            const int transfer = min(temp, task_count);
-            one[Next(status)] = transfer;
-            person_tasks[Next(status)] += transfer;
-            person_tasks[status] -= transfer;
-            task_count -= transfer;
-            two[status] = temp - transfer; 
-        }
-        return {one, two};
+    });
+}
+
+void PrintNames(const vector<Animal>& animals) {
+    for (const Animal& animal : animals) {
+        cout << animal.name << ' ';
     }
-
-    static TaskStatus Next(TaskStatus task_status) {
-        return static_cast<TaskStatus>(static_cast<int>(task_status) + 1);
-    }
-
-private:
-    map<string, TasksInfo> tasks_;
-};
-
-// Принимаем словарь по значению, чтобы иметь возможность
-// обращаться к отсутствующим ключам с помощью [] и получать 0,
-// не меняя при этом исходный словарь.
-void PrintTasksInfo(TasksInfo tasks_info) {
-    cout << tasks_info[TaskStatus::NEW] << " new tasks"s
-         << ", "s << tasks_info[TaskStatus::IN_PROGRESS] << " tasks in progress"s
-         << ", "s << tasks_info[TaskStatus::TESTING] << " tasks are being tested"s
-         << ", "s << tasks_info[TaskStatus::DONE] << " tasks are done"s << endl;
+    cout << endl;
 }
 
 int main() {
-    TeamTasks tasks;
-    tasks.AddNewTask("Ilia"s);
-    for (int i = 0; i < 3; ++i) {
-        tasks.AddNewTask("Ivan"s);
-    }
-    cout << "Ilia's tasks: "s;
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ilia"s));
-    cout << "Ivan's tasks: "s;
-    PrintTasksInfo(tasks.GetPersonTasksInfo("Ivan"s));
-
-    TasksInfo updated_tasks, untouched_tasks;
-
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-    cout << "Updated Ivan's tasks: "s;
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: "s;
-    PrintTasksInfo(untouched_tasks);
-
-    tie(updated_tasks, untouched_tasks) = tasks.PerformPersonTasks("Ivan"s, 2);
-    cout << "Updated Ivan's tasks: "s;
-    PrintTasksInfo(updated_tasks);
-    cout << "Untouched Ivan's tasks: "s;
-    PrintTasksInfo(untouched_tasks);
+    vector<Animal> animals = {
+        {"Мурка"s,   10, 5},
+        {"Белка"s,   5,  1.5},
+        {"Георгий"s, 2,  4.5},
+        {"Рюрик"s,   12, 3.1},
+    };
+    PrintNames(animals);
+    SortBy(animals, [](const Animal& animal) { return animal.name; }, true);
+    PrintNames(animals);
+    SortBy(animals, [](const Animal& animal) { return animal.weight; });
+    PrintNames(animals);
+    return 0;
 }
