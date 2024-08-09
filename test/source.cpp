@@ -1,44 +1,81 @@
-#include <algorithm>
 #include <iostream>
+#include <map>
+#include <string>
 #include <vector>
 
 using namespace std;
 
-struct Animal {
-    string name;
-    int age;
-    double weight;
-};
-
-template <typename Container, typename KeyMapper>
-void SortBy(Container& container, KeyMapper key_mapper, bool reverse = false) {
-    sort(container.begin(), container.end(), [key_mapper, reverse](const auto& lhs, const auto& rhs) {
-        if (reverse) {
-            return key_mapper(lhs) > key_mapper(rhs);
-        } else {
-            return key_mapper(lhs) < key_mapper(rhs);
-        }
-    });
-}
-
-void PrintNames(const vector<Animal>& animals) {
-    for (const Animal& animal : animals) {
-        cout << animal.name << ' ';
-    }
-    cout << endl;
-}
-
 int main() {
-    vector<Animal> animals = {
-        {"Мурка"s,   10, 5},
-        {"Белка"s,   5,  1.5},
-        {"Георгий"s, 2,  4.5},
-        {"Рюрик"s,   12, 3.1},
-    };
-    PrintNames(animals);
-    SortBy(animals, [](const Animal& animal) { return animal.name; }, true);
-    PrintNames(animals);
-    SortBy(animals, [](const Animal& animal) { return animal.weight; });
-    PrintNames(animals);
+    int q;
+    cin >> q;
+
+    map<string, vector<string>> buses_to_stops, stops_to_buses;
+
+    for (int i = 0; i < q; ++i) {
+        string operation_code;
+        cin >> operation_code;
+
+        if (operation_code == "NEW_BUS"s) {
+            string bus;
+            cin >> bus;
+            int stop_count;
+            cin >> stop_count;
+            vector<string>& stops = buses_to_stops[bus];
+            stops.resize(stop_count);
+            for (string& stop : stops) {
+                cin >> stop;
+                stops_to_buses[stop].push_back(bus);
+            }
+        } else if (operation_code == "BUSES_FOR_STOP"s) {
+            string stop;
+            cin >> stop;
+            if (stops_to_buses.count(stop) == 0) {
+                cout << "No stop"s << endl;
+            } else {
+                bool is_first = true;
+                for (const string& bus : stops_to_buses[stop]) {
+                    if (!is_first) {
+                        cout << " "s;
+                    }
+                    is_first = false;
+                    cout << bus;
+                }
+                cout << endl;
+            }
+        } else if (operation_code == "STOPS_FOR_BUS"s) {
+            string bus;
+            cin >> bus;
+            if (buses_to_stops.count(bus) == 0) {
+                cout << "No bus"s << endl;
+            } else {
+                for (const string& stop : buses_to_stops[bus]) {
+                    cout << "Stop "s << stop << ":"s;
+                    if (stops_to_buses[stop].size() == 1) {
+                        cout << " no interchange"s;
+                    } else {
+                        for (const string& other_bus : stops_to_buses[stop]) {
+                            if (bus != other_bus) {
+                                cout << " "s << other_bus;
+                            }
+                        }
+                    }
+                    cout << endl;
+                }
+            }
+        } else if (operation_code == "ALL_BUSES"s) {
+            if (buses_to_stops.empty()) {
+                cout << "No buses"s << endl;
+            } else {
+                for (const auto& bus_item : buses_to_stops) {
+                    cout << "Bus "s << bus_item.first << ":"s;
+                    for (const string& stop : bus_item.second) {
+                        cout << " "s << stop;
+                    }
+                    cout << endl;
+                }
+            }
+        }
+    }
+
     return 0;
 }
