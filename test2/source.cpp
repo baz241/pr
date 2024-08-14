@@ -1,37 +1,77 @@
+/*
 #include <iostream>
-#include <string>
+#include <vector>
 
 using namespace std;
 
-template <typename T, typename U>
-void AssertEqualImpl(const T& t, const U& u, const string& t_str, const string& u_str, const string& file,
-                     const string& func, unsigned line, const string& hint) {
-    if (t != u) {
-        cout << boolalpha;
-        cout << file << "("s << line << "): "s << func << ": "s;
-        cout << "ASSERT_EQUAL("s << t_str << ", "s << u_str << ") failed: "s;
-        cout << t << " != "s << u << "."s;
-        if (!hint.empty()) {
-            cout << " Hint: "s << hint;
-        }
-        cout << endl;
-        abort();
+int main() {
+    const vector<int> v = {6, 18, 2093};
+    for (int i = 0; i < v.size(); ++i) {
+        cout << v[i] << endl;
     }
 }
+*/
 
-#define ASSERT_EQUAL(a, b) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, ""s)
+/*
+#include <iostream>
+#include <vector>
 
-#define ASSERT_EQUAL_HINT(a, b, hint) AssertEqualImpl((a), (b), #a, #b, __FILE__, __FUNCTION__, __LINE__, (hint))
+using namespace std;
 
-int Sum(int a, int b) {
-    // Ошибка допущена намеренно, чтобы продемонстрировать вывод информации об ошибке
-    return a + b + 1;
+int main() {
+    const vector<int> v = {6, 18, 2093};
+    for (int i = 0; i < v.size(); ++i) {
+        cout << v[i] << endl;
+    }
+}
+*/
+
+/*
+#include <iostream>
+#include <map>
+
+using namespace std;
+
+int main() {
+    const map<string, int> cities_birth = {
+        {"Moscow"s, 1147},
+        {"Saint Petersburg"s, 1703},
+        {"Petropavlovsk-Kamchatshiy"s, 1740},
+    };
+    for (const auto& [name, birth] : cities_birth) {
+        cout << name << " is "s << 2020 - birth << " years old"s << endl;
+    }
+}
+*/
+
+
+#include <iostream>
+#include <string>
+#include <vector>
+    
+using namespace std;
+
+vector<string> SplitIntoWords(const string& text) {
+    vector<string> words;
+    for (size_t i = 0; i < text.size(); ++i) {
+        if (text[i] == ' ') {
+            continue;
+        }
+        const size_t space_pos = text.find(' ', i);
+        if (space_pos == text.npos) {
+            words.push_back(text.substr(i));
+            break;
+        } else {
+            words.push_back(text.substr(i, space_pos - i));
+            i = space_pos;
+        }
+    }
+    return words;
 }
 
 int main() {
-    string hello = "hello"s;
-    ASSERT_EQUAL(hello.length(), 5);
-
-    // Эта проверка не пройдёт
-    ASSERT_EQUAL_HINT(Sum(2, 2), 4, "Sum() must be correct"s);
+    const string query = "hello kitty"s;
+    for (const auto& word : SplitIntoWords(query)) {
+        cout << '[' << word << ']' << endl;
+    }
 }
