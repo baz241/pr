@@ -44,7 +44,7 @@ int main() {
 }
 */
 
-
+/*
 #include <iostream>
 #include <string>
 #include <vector>
@@ -75,3 +75,77 @@ int main() {
         cout << '[' << word << ']' << endl;
     }
 }
+*/
+
+/*
+using namespace std;
+
+class Rational {
+public:
+    Rational() {
+        numerator_ = 0;
+        denominator_ = 1;
+    }
+
+    int Numerator() const {
+        return numerator_;
+    }
+
+    int Denominator() const {
+        return denominator_;
+    }
+    
+    void SetNumerator(int numerator) {
+        numerator_ = numerator;
+    }
+
+    void SetDenominator(int denominator) {
+        if (denominator != 0) {
+            denominator_ = denominator;
+        }
+    }
+
+private:
+    int numerator_;
+    int denominator_;
+};
+*/
+
+
+#include <string>
+
+using namespace std;
+
+enum class AnimalType {
+    Cat,
+    Dog,
+    Mouse,
+};
+
+class Animal {
+public:
+    Animal() = default;
+
+    Animal(AnimalType type, const string& name, const string& owner_name) {
+        type_ = type;
+        name_ = name;
+        owner_name_ = owner_name;
+    }
+
+    AnimalType GetType() const {
+        return type_;
+    }
+
+    const string& GetName() const {
+        return name_;
+    }
+
+    const string& GetOwnerName() const {
+        return owner_name_;
+    }
+
+private:
+    AnimalType type_ = AnimalType::Cat;
+    string name_ = "Boris"s;
+    string owner_name_ = "Ivan"s;
+};
